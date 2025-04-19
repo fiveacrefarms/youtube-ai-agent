@@ -1,13 +1,13 @@
 name: Daily AI Agent on.
-schedule:
-  - cron: "0 0 * * 1-7"
-workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1-7"
+  workflow_dispatch:
 
-jobs:
-  run-bot:
-    runs-on: ubuntu-latest 
+  jobs:
+    run-bot:
+      runs-on: ubuntu-latest 
     
-    steps:
+      steps:
         - ﻿﻿name: Checkout code
           uses: actions/checkout@v4
           
