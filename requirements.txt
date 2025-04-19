@@ -1,0 +1,4 @@
+pytrends==4.9.2
+gtts==2.4.0
+google-api-python-client==2.120.0
+requests==2.31.0
