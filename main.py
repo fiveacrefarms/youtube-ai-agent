@@ -34,7 +34,11 @@ def get_trends():
 
     try:
         return pytrends.trending_searches(pn='US').head(3)[0].tolist()
-    except:
+    except: ValueError:
+        print("ValueError occurred")
+        except:
+            print("Fallback: Using default trends")
+        
         return ["Trend1", "Trend2", "Trend3"]  # Fallback
         trends = pytrends.trending_searches(pn='US')  # Correct method name
         return trends.head(3)[0].tolist()  # Return top 3 trends
