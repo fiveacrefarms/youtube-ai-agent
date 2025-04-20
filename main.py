@@ -29,7 +29,7 @@ def create_audio(text, filename):
 # 4. Get Free Images
 def get_images(query):
     url = f"https://api.pexels.com/v1/search?query={query}&per_page=3"
-    headers = {"Authorization": os.getenv(E5FfhDGgnXdJEXICqgO6fAvA3oVbmiZOGd9r3XZDT4docdzmqLrdZFlL)}
+    headers = {"Authorization": os.getenv(PEXELS_KEY)}
     res = requests.get(url, headers=headers).json()
     return [photo['src']['medium'] for photo in res['photos']]
 
