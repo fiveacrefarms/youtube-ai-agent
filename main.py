@@ -13,7 +13,7 @@ load_dotenv()
 
 def get_trends():
     pytrends = TrendReq(h1='en-US', tz=360)
-    trending_topics = pytrends.trending_searches(pn='united_states').
+    trending_topics = pytrends.trending_searches(pn='US')
     return trending_topics.head(3)[0].tolist()
 
 def generate_script(topic):
