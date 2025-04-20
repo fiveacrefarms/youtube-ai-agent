@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_trends():
-    pytrends = TrendReq(h1='en-US', tz=360)
+    pytrends = TrendReq(hl='en-US', tz=360)
     trending_topics = pytrends.trending_searches(pn='US')
     return trending_topics.head(3)[0].tolist()
 
