@@ -12,9 +12,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_trends():
-    pytrends = TrendReq(hl='en-US', tz=360)
-    trending = pytrends.trending_searches(pn='US')
-    return trending_topics.head(3)[0].tolist()
+    try:
+        # Add browser-like headers and retries
+        pytrends = TrendReq(
+            hl='en-US',
+            tz=360,
+            retries=3,
+            backoff_factor=0.5,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9"
+            }
+        )
+        trends = pytrends.trending_searches(pn='US')  # Correct method name
+        return trends.head(3)[0].tolist()  # Return top 3 trends
+    except Exception as e:
+        print(f"Google Trends Error: {e}")
+        return ["Tech News", "Sports", "Entertainment"]  # Fallback if blocked
 
 def generate_script(topic):
     return f"Breaking news! {topic} is trending right now. Stay tuned for updates!"
