@@ -11,45 +11,43 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 1. Get Trends
 def get_trends():
     pytrends = TrendReq()
     trends = pytrends.trending_searches(pn='US').head(3).values.tolist()
     return [trend[0] for trend in trends]
 
-# 2. Generate Script
 def generate_script(topic):
     return f"Breaking news! {topic} is trending right now. Stay tuned for updates!"
 
-# 3. Create Audio
 def create_audio(text, filename):
     tts = gTTS(text=text, lang='en')
     tts.save(filename)
 
-# 4. Get Free Images
 def get_images(query):
     url = f"https://api.pexels.com/v1/search?query={query}&per_page=3"
-    headers = {"Authorization": os.getenv(PEXELS_KEY)}
+    headers = {"Authorization": os.getenv('PEXELS_KEY')}
     res = requests.get(url, headers=headers).json()
     return [photo['src']['medium'] for photo in res['photos']]
 
-# 5. Make Video
 def make_video(images, audio, output):
     clips = [ImageClip(img).set_duration(3) for img in images]
     video = concatenate_videoclips(clips)
     video = video.set_audio(AudioFileClip(audio))
     video.write_videofile(output, fps=24)
 
-# 6. Upload to YouTube
 def upload_to_yt(email, password, video_path, title):
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.get("https://studio.youtube.com")
     
     # Login
-    driver.find_element(By.ID, "identifierId").send_keys(mijuanhonglo@gmail.com)
+    driver.find_element(By.ID, "identifierId").send_keys(email)
     driver.find_element(By.ID, "identifierNext").click()
     sleep(2)
-    driver.find_element(By.NAME, "Passwd").send_keys(!$Hong78Lo$!)
+    driver.find_element(By.NAME, "Passwd").send_keys(password)
     driver.find_element(By.ID, "passwordNext").click()
     sleep(5)
     
@@ -70,8 +68,8 @@ if __name__ == "__main__":
         images = get_images(trend)
         make_video(images, f"audio_{idx}.mp3", f"video_{idx}.mp4")
         upload_to_yt(
-            os.getenv(mijuanhonglo@gmail.com),
-            os.getenv!$Hong78Lo$!),
+            os.getenv('YT_EMAIL'),
+            os.getenv('YT_PASSWORD'),
             f"video_{idx}.mp4",
             f"{trend} Trending Now!"
         )
