@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_trends():
-    pytrends = TrendReq()
-    trends = pytrends.trending_searches(pn='US').head(3).values.tolist()
-    return [trend[0] for trend in trends]
+    pytrends = TrendReq(h1='en-US', tz=360)
+    trending_topics = pytrends.trending_searches(pn='united_states').
+    return trending_topics.head(3)[0].tolist()
 
 def generate_script(topic):
     return f"Breaking news! {topic} is trending right now. Stay tuned for updates!"
