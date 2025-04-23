@@ -1,7 +1,6 @@
 gtts
 ffmpeg
-moviepy==1.0.3
-moviepy.editor
+moviepy
 pandas
 google-auth-oauthlib
 google-api-python-client
