@@ -6,7 +6,7 @@ from moviepy import TextClip, AudioFileClip, VideoFileClip
 import time
 import pandas as pd
 
-trends_data = pd.read_csv(r"C:\Users\captk\trending_US.csv")
+trends_data = pd.read_csv("trending_US.csv")
 print(trends_data.head())
 
 
