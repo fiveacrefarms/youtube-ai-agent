@@ -87,17 +87,17 @@ def generate_audio(text, filename):
 if __name__ == "__main__":
     main()
         # Generate audio
-        generate_audio(trend_text, audio_file)
+    generate_audio(trend_text, audio_file)
 
         # Create video
-        create_video(audio_file, video_file, trend_text)
+    create_video(audio_file, video_file, trend_text)
 
         # Upload to YouTube
-        upload_to_youtube(video_file, trend, f"Latest trend on {datetime.now().strftime('%Y-%m-%d')}")
+    upload_to_youtube(video_file, trend, f"Latest trend on {datetime.now().strftime('%Y-%m-%d')}")
 
         # Cleanup
-        os.remove(audio_file)
-        os.remove(video_file)
+    os.remove(audio_file)
+    os.remove(video_file)
 
 if __name__ == "__main__":
     main()
