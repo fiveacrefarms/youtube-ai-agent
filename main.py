@@ -1,15 +1,26 @@
 import os
-import time
-from datetime import datetime
 from gtts import gTTS
-from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.editor import TextClip, AudioFileClip, CompositeVideoClip
 
-# Removed YouTube-specific imports
+# Define constants
+OUTPUT_DIR = r"C:\Users\captk\youtube-ai-agent\build\artifacts"
+TRENDS = ["Abundance", "Meditation", "Manifest Anything"]
 
 def fetch_trends():
-    return ["Abundance", "Meditation", "Manifest Anything"]
+    """
+    Fetch the trends for video generation.
+    Returns:
+        list: A list of trending topics.
+    """
+    return TRENDS
 
 def generate_audio(text, audio_path):
+    """
+    Generate an audio file using Google Text-to-Speech (gTTS).
+    Args:
+        text (str): The text to be converted into speech.
+        audio_path (str): The path to save the audio file.
+    """
     try:
         tts = gTTS(text=text, lang="en")
         tts.save(audio_path)
@@ -18,68 +29,56 @@ def generate_audio(text, audio_path):
         print(f"[ERROR] Failed to generate audio: {e}")
 
 def create_video(audio_path, video_path, text):
+    """
+    Create a video file with text overlay and audio.
+    Args:
+        audio_path (str): The path to the audio file.
+        video_path (str): The path to save the video file.
+        text (str): The text to display in the video.
+    """
     try:
-        text_clip = TextClip(text, fontsize=50, color="white", size=(1280, 720), bg_color="black")
-        text_clip = text_clip.set_duration(10)
+        # Create a text clip
+        text_clip = TextClip(
+            text,
+            fontsize=50,
+            color="white",
+            size=(1280, 720),
+            bg_color="black"
+        ).set_duration(10)  # Duration in seconds
+
+        # Load the audio file
         audio = AudioFileClip(audio_path)
-        video = text_clip.set_audio(audio)
+
+        # Combine text and audio into a video
+        video = CompositeVideoClip([text_clip]).set_audio(audio)
         video.write_videofile(video_path, fps=24)
         print(f"[VIDEO CREATED] {video_path}")
     except Exception as e:
         print(f"[ERROR] Failed to create video: {e}")
 
-def create_artifacts():
-    try:
-        # Define the artifacts directory
-        artifacts_dir = "artifacts"
-        os.makedirs(artifacts_dir, exist_ok=True)
-
 def main():
+    """
+    Main function to generate videos based on trending topics.
+    """
     try:
-        # Removed YouTube authentication
-
-        trends = fetch_trends()
-        for idx, trend in enumerate(trends):
-            # Define paths for saving audio and video locally
-            output_dir = r"C:\Users\captk\videos"
-            os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
-            audio_file = os.path.join(output_dir, f"audio_{idx}.mp3")
-            video_file = os.path.join(output_dir, f"video_{idx}.mp4")
-            trend_text = f"Manifest ANYTHING {trend} in just 10 minutes!"
-
-            print(f"\n[PROCESSING TREND] {trend}")
-            generate_audio(trend_text, audio_file)
-            create_video(audio_file, video_file, trend_text)
-
-def main():
-
-    try:
-       
-        output_dir = r"C:\Users\captk\videos"
-        os.makedirs(output_dir, exist_ok=True)  # Create the directory if it doesn't exist
+        # Ensure the output directory exists
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
 
         # Fetch trends and generate audio and video files
         trends = fetch_trends()
         for idx, trend in enumerate(trends):
             print(f"\n[PROCESSING TREND] {trend}")
-            
+
             # Define file paths
-            audio_path = os.path.join(output_dir, f"audio_{idx}.mp3")
-            video_path = os.path.join(output_dir, f"video_{idx}.mp4")
+            audio_path = os.path.join(OUTPUT_DIR, f"audio_{idx}.mp3")
+            video_path = os.path.join(OUTPUT_DIR, f"video_{idx}.mp4")
             trend_text = f"Manifest ANYTHING {trend} in just 10 minutes!"
 
             # Generate and save audio and video files
             generate_audio(trend_text, audio_path)
             create_video(audio_path, video_path, trend_text)
 
-        print(f"\n[ALL FILES SAVED] Files have been saved to: {output_dir}")
-    except Exception as e:
-        print(f"[ERROR] Unexpected error occurred: {e}")
-
-if __name__ == "__main__":
-    main()
-            
-            time.sleep(5)
+        print(f"\n[ALL FILES SAVED] Files have been saved to: {OUTPUT_DIR}")
     except Exception as e:
         print(f"[ERROR] Unexpected error occurred: {e}")
 
