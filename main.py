@@ -62,24 +62,25 @@ def upload_to_youtube(video_file, title, description):
     request = youtube.videos().insert(part="snippet,status", body=request_body, media_body=media)
     response = request.execute()
     print(f"Uploaded video with ID: {response['id']}")
+def fetch_trends():
+    # Simulate fetching trends (replace with your actual logic)
+    return ["abundance", "earth day", "meditation"]
 
-# Step 5: Main Logic
 def main():
     try:
-        # Replace `fetch_trends` with a direct list of trends
-        trends = ["abundance", "earth day", "meditation"]
-        for trend in trends:
-            print(f"Processing trend: {trend}")
+        # Fetch trends
+        trends = fetch_trends()
+
+        # Iterate through the trends and process them
+        for i, trend in enumerate(trends):
+            print(f"Processing trend {i + 1}: {trend}")
+
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
+# Run the main function
 if __name__ == "__main__":
     main()
-    for i, trend in enumerate(trends):
-        trend_text = f"Here's what trending: 0"
-        audio_file = f"audio_{0}.mp3"
-        video_file = f"video_{0}.mp4"
-
         # Generate audio
         generate_audio(trend_text, audio_file)
 
