@@ -38,7 +38,7 @@ def upload_to_youtube(video_file, title, description):
     api_version = "v3"
     client_secrets_file = "client_secrets.json"  # Download this from Google Cloud Console
 
-    youtube = build(api_service_name, api_version, developerKey=os.getenv("YOUTUBE_API_KEY"))
+    youtube = build("youtube", "v3", developerKey=os.getenv("YOUTUBE_API_KEY"))
 
     # Prepare the video metadata
     request_body = {
