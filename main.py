@@ -67,10 +67,12 @@ def fetch_trends():
     return ["abundance", "earth day", "meditation"]
 
 def main():
-    try:
+   try:
+        # Example trends list
         trends = ["abundance", "earth day", "meditation"]
 
         for trend in trends:
+            # Generate the text and output file name for the trend
             trend_text = f"Processing trend: {trend}"
             audio_file = f"{trend.replace(' ', '_')}.mp3"
 
