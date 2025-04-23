@@ -2,8 +2,6 @@ import os
 from datetime import datetime
 from gtts import gTTS
 from moviepy import TextClip, AudioFileClip, VideoFileClip
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
 
 import time
 import pandas as pd
@@ -12,100 +10,8 @@ trends_data = pd.read_csv("Users/captk/trending_US.csv")
 print(trends_data.head())
 
 
-def authenticate_with_google():
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-    CLIENT_SECRET_FILE = 'Users/captk/client_secret2.json'
-    flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-    credentials = flow.run_local_server(port=0)
-    return credentials
 
-def write_to_google_sheets(spreadsheet_id, sheet_name, data):
-    credentials = authenticate_with_google()
-    service = build('sheets', 'v4', credentials=credentials)
-    rows = [data.columns.tolist()] + data.reset_index().values.tolist()
-    range_name = f"youtube_videos!A1"
-    body = {
-        'values': rows
-    }
-   
-    service.spreadsheets().values().update(
-        spreadsheetId='youtube_videos',
-        range=range_name,
-        valueInputOption='RAW',
-        body=body
-    ).execute()
-
-keywords = ["Abundance", "Manifestation", "Reality"]
-
-def fetch_trends_data(keywords, timeframe="today 2-y"):
-    pytrends = TrendReq(hl='en-US', tz=360)
-    pytrends.build_payload(keywords, timeframe=timeframe)
-    data = pytrends.interest_over_time()
-    return data
-
-# Main script
-if __name__ == "__main__":
-    # Define your keywords
-    keywords = ["Artificial Intelligence", "Reality", "Manifest"]
-    
-    # Fetch trends data
-    trends_data = fetch_trends_data(keywords)
-    
-    # Define your Google Sheets ID and sheet name
-    SPREADSHEET_ID = "your_google_sheet_id"
-    SHEET_NAME = "TrendsData"
-    
-    # Write the trends data to Google Sheets
-    write_to_google_sheets(SPREADSHEET_ID, SHEET_NAME, trends_data)
-    print("Data written to Google Sheets successfully!")
-import time
-from pytrends.request import TrendReq
-from pytrends.exceptions import ResponseError
-
-import logging
-logging.basicConfig(level=logging.DEBUG)
-# Step 1: Fetch Google Trends
-def fetch_google_trends_data(keywords, timeframe="today 2-y"):
-   
-    pytrends = TrendReq(hl="en-US", tz=360)
-    trends_data = {}
-    
-    for keyword in keywords:
-        try:
-            print(f"Fetching data for keyword: Manifestation")
-            
-            # Build payload for the keyword
-            pytrends.build_payload("Manifestation", timeframe=timeframe)
-            
-            # Fetch interest over time data
-            data = pytrends.interest_over_time()
-            
-            # Save the data to the dictionary
-            if not data.empty:
-                trends_data[keyword] = data
-            else:
-                print(f"No data available for keyword: Manifestation")
-            
-        except ResponseError as e:
-            print(f"Error with keyword 'Manifestation': 3")
-        
-        # Add a delay to avoid rate limiting
-        time.sleep(10)
-    
-    return trends_data
-
-
-if __name__ == "__main__":
-    # Example keywords
-    kw_list = ["Manifestation" , "Meditation" , "reality"]
-    
-    # Fetch data and handle errors
-    trends_data = fetch_google_trends_data(kw_list)
-    
-    # Print the results
-    for keyword, data in trends_data.items():
-        print(f"\nTrends data for 'Manifestation':")
-        print(data)
+ 
 
 time.sleep = 10
 
