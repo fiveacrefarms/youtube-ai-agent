@@ -3,14 +3,14 @@ name: Run main.py Workflow
 on:
   schedule:
     - cron: '0 12 * * *' # Runs daily at 12:00 PM UTC (7:00 AM CST/CDT)
-  workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch: # Allows manual triggering
   push: # Triggers when code is pushed to the repository
     branches:
       - main
 
 jobs:
   run-script:
-    runs-on: windows-latest # Updated to match your Windows environment
+    runs-on: windows-latest # Updated to match your environment
 
     steps:
     - name: Checkout code
