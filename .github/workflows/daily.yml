@@ -31,5 +31,5 @@ jobs:
 
     - name: Run Main Script
       env:
-        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }} # Store your API key in GitHub Secrets
+        YT_API_KEY: ${{ secrets.YT_API_KEY }} # Store your API key in GitHub Secrets
       run: python main.py
