@@ -34,7 +34,7 @@ def create_video(audio_path, output_path, text):
 video_file = "ytv_0.mp4"
 
 # Step 4: Upload Video to YouTube
-def upload_to_youtube(video_file, "THIS is stopping manifestation" , "Yon need to see this NOW"):
+def upload_to_youtube(video_file, title, description):
     # Authenticate with YouTube API
     api_service_name = "youtube"
     api_version = "v3"
