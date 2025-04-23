@@ -25,17 +25,19 @@ def write_to_google_sheets(spreadsheet_id, sheet_name, data):
     credentials = authenticate_with_google()
     service = build('sheets', 'v4', credentials=credentials)
     rows = [data.columns.tolist()] + data.reset_index().values.tolist()
-    range_name = f"{sheet_name}!A1"
+    range_name = f"youtube_videos!A1"
     body = {
         'values': rows
     }
    
     service.spreadsheets().values().update(
-        spreadsheetId=spreadsheet_id,
+        spreadsheetId='youtube_videos',
         range=range_name,
         valueInputOption='RAW',
         body=body
     ).execute()
+
+keywords = ["Abundance", "Manifestation", "Reality"]
 
 def fetch_trends_data(keywords, timeframe="today 2-y"):
     pytrends = TrendReq(hl='en-US', tz=360)
@@ -72,10 +74,10 @@ def fetch_google_trends_data(keywords, timeframe="today 2-y"):
     
     for keyword in keywords:
         try:
-            print(f"Fetching data for keyword: {keyword}")
+            print(f"Fetching data for keyword: Manifestation")
             
             # Build payload for the keyword
-            pytrends.build_payload([keyword], timeframe=timeframe)
+            pytrends.build_payload("Manifestation", timeframe=timeframe)
             
             # Fetch interest over time data
             data = pytrends.interest_over_time()
@@ -84,10 +86,10 @@ def fetch_google_trends_data(keywords, timeframe="today 2-y"):
             if not data.empty:
                 trends_data[keyword] = data
             else:
-                print(f"No data available for keyword: {keyword}")
+                print(f"No data available for keyword: Manifestation")
             
         except ResponseError as e:
-            print(f"Error with keyword '{keyword}': {e}")
+            print(f"Error with keyword 'Manifestation': 3")
         
         # Add a delay to avoid rate limiting
         time.sleep(10)
@@ -97,15 +99,18 @@ def fetch_google_trends_data(keywords, timeframe="today 2-y"):
 
 if __name__ == "__main__":
     # Example keywords
-    kw_list = ["Quantum Realm", "Meditation", "reality"]
+    kw_list = ["Manifestation" , "Meditation" , "reality"]
     
     # Fetch data and handle errors
     trends_data = fetch_google_trends_data(kw_list)
     
     # Print the results
     for keyword, data in trends_data.items():
-        print(f"\nTrends data for '{keyword}':")
+        print(f"\nTrends data for 'Manifestation':")
         print(data)
+
+time.sleep = 10
+
 text = "THIS is stopping manifestation or your DESIRED reality!"
 # Step 2: Generate Text-to-Speech
 def generate_audio(text, audio_path):
@@ -131,7 +136,7 @@ def upload_to_youtube(video_file, title, description):
     # Authenticate with YouTube API
     api_service_name = "youtube"
     api_version = "v3"
-    client_secrets_file = "client_secrets.json"  # Download this from Google Cloud Console
+    client_secrets_file = "client_secrets2.json"  # Download this from Google Cloud Console
 
     youtube = build("youtube", "v3", developerKey=os.getenv("YOUTUBE_API_KEY"))
 
@@ -159,7 +164,7 @@ def main():
     trends = fetch_trends()
 
     for i, trend in enumerate(trends):
-        trend_text = f"Here's what trending: {trend}"
+        trend_text = f"Here's what trending: 0"
         audio_file = f"audio_{0}.mp3"
         video_file = f"video_{0}.mp4"
 
