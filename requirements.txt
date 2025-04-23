@@ -1,8 +1,5 @@
-pytrends
 gtts
 moviepy
-selenium
-playwright
 pandas
 google-auth-oauthlib
 google-api-python-client
