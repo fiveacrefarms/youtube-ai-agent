@@ -19,6 +19,7 @@ jobs:
         run: |
           python main.py
         env:
-          key: ${{ secrets.key }} # if run.py requires passwords..etc, set it as secrets
+          YT_EMAIL: ${{ secrets.YT_EMAIL }} 
+          YT_PASSWORD: ${{ secrets.YT_PASSWORD }} # if run.py requires passwords..etc, set it as secrets
       - name: export index
         .... # use crosponding script or actions to help export.
