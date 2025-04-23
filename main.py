@@ -65,8 +65,16 @@ def upload_to_youtube(video_file, title, description):
 
 # Step 5: Main Logic
 def main():
-    trends = fetch_trends()
+    try:
+        # Replace `fetch_trends` with a direct list of trends
+        trends = ["abundance", "earth day", "meditation"]
+        for trend in trends:
+            print(f"Processing trend: {trend}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
+if __name__ == "__main__":
+    main()
     for i, trend in enumerate(trends):
         trend_text = f"Here's what trending: 0"
         audio_file = f"audio_{0}.mp3"
