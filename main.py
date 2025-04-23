@@ -6,10 +6,12 @@ from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+kw_list = ["manifestation", "inner voice", "my purpose"]
 # Step 1: Fetch Google Trends
 def fetch_trends():
     pytrends = TrendReq()
-    pytrends.build_payload(kw_list=["manifestation", "inner voice", "my purpose"], geo="US", timeframe="now 3-d")
+    kw_list = ["manifestation", "inner voice", "my purpose"]
+    pytrends.build_payload(kw_list=kw_list, geo="US", timeframe="now 3-d")
     trends = pytrends.trending_searches(pn="united_states")
     return trends[0].head(3).values.tolist()
 
