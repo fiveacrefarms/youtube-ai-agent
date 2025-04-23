@@ -68,17 +68,22 @@ def fetch_trends():
 
 def main():
     try:
-        # Fetch trends
-        trends = fetch_trends()
+        trends = ["abundance", "earth day", "meditation"]
 
-        # Iterate through the trends and process them
-        for i, trend in enumerate(trends):
-            print(f"Processing trend {i + 1}: {trend}")
+        for trend in trends:
+            trend_text = f"Processing trend: {trend}"
+            audio_file = f"{trend.replace(' ', '_')}.mp3"
+
+            # Call function to generate audio
+            generate_audio(trend_text, audio_file)
 
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-# Run the main function
+# Example function for generating audio (replace with your actual implementation)
+def generate_audio(text, filename):
+    print(f"Generating audio for: {text} -> {filename}")
+
 if __name__ == "__main__":
     main()
         # Generate audio
