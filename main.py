@@ -1,7 +1,5 @@
 import os
 from datetime import datetime
-from pytrends.request import TrendReq
-from pytrends.exceptions import ResponseError
 from gtts import gTTS
 from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
@@ -9,9 +7,9 @@ from googleapiclient.http import MediaFileUpload
 
 import time
 import pandas as pd
-from pytrends.request import TrendReq
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+
+trends_data = pd.read_csv("Users/captk/trending_US.csv")
+print(trends_data.head())
 
 
 def authenticate_with_google():
