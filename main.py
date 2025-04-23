@@ -104,8 +104,8 @@ def main():
 
     for i, trend in enumerate(trends):
         trend_text = f"Here's what trending: {trend}"
-        audio_file = f"audio_{i}.mp3"
-        video_file = f"video_{i}.mp4"
+        audio_file = f"audio_{0}.mp3"
+        video_file = f"video_{0}.mp4"
 
         # Generate audio
         generate_audio(trend_text, audio_file)
