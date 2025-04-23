@@ -35,3 +35,17 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: .gitignore/client_secrets2.json
       run: |
         python main.py
+
+    - name: Generate artifacts
+      run: |
+        mkdir -p artifacts
+        python main.py # Replace with the script that generates artifacts
+        # Move or copy generated files to the artifacts folder
+        mv generated_file_1.txt artifacts/
+        mv generated_file_2.log artifacts/
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-artifacts
+        path: -r "c:\Users\captk\videos
