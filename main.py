@@ -15,9 +15,9 @@ def fetch_trends():
 
 text = "THIS is stopping manifestation or your DESIRED reality!"
 # Step 2: Generate Text-to-Speech
-def generate_audio(text, "audio_0.mp3"):
+def generate_audio(text, audio_path):
     tts = gTTS(text=text, lang="en")
-    tts.save(text_0.mp3)
+    tts.save("text_0.mp3")
 
 # Step 3: Create Faceless Video
 def create_video("audio_0.mp3", "ytv_0.mp4", text):
