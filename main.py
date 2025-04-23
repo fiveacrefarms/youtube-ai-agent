@@ -3,103 +3,101 @@ import time
 from datetime import datetime
 from gtts import gTTS
 from moviepy.editor import TextClip, AudioFileClip
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery_cache.base import Cache
 
-# Step 1: Fetch trends (simulating fetching trends)
+class MemoryCache(Cache):
+    _CACHE = {}
+
+    def get(self, url):
+        return self._CACHE.get(url)
+
+    def set(self, url, content):
+        self._CACHE[url] = content
+
 def fetch_trends():
-    # Replace this with actual logic to fetch trends
-    return ["abundance", "earth day", "meditation"]
+    return ["Abundance", "Meditation", "Manifest Anything"]
 
-# Step 2: Generate Text-to-Speech
 def generate_audio(text, audio_path):
-    """
-    Generate audio from text using Google Text-to-Speech (gTTS).
-    Args:
-        text (str): The text to convert to speech.
-        audio_path (str): The output path for the audio file.
-    """
     try:
         tts = gTTS(text=text, lang="en")
         tts.save(audio_path)
-        print(f"Audio generated successfully: {audio_path}")
+        print(f"[AUDIO GENERATED] {audio_path}")
     except Exception as e:
-        print(f"Error generating audio: {e}")
+        print(f"[ERROR] Failed to generate audio: {e}")
 
-# Step 3: Create Faceless Video
-def create_video(audio_path, output_path, text):
-    """
-    Create a faceless video with text and audio.
-    Args:
-        audio_path (str): Path to the audio file.
-        output_path (str): Path to save the generated video.
-        text (str): Text to display in the video.
-    """
+def create_video(audio_path, video_path, text):
     try:
-        # Create a text clip
-        text_clip = TextClip(text, fontsize=70, color="white", size=(1280, 720), bg_color="black")
-        text_clip = text_clip.set_duration(10)  # 10 seconds per slide
-
-        # Add audio to the text clip
+        text_clip = TextClip(text, fontsize=50, color="white", size=(1280, 720), bg_color="black")
+        text_clip = text_clip.set_duration(10)
         audio = AudioFileClip(audio_path)
         video = text_clip.set_audio(audio)
-
-        # Export the video
-        video.write_videofile(output_path, fps=24)
-        print(f"Video created successfully: {output_path}")
+        video.write_videofile(video_path, fps=24)
+        print(f"[VIDEO CREATED] {video_path}")
     except Exception as e:
-        print(f"Error creating video: {e}")
+        print(f"[ERROR] Failed to create video: {e}")
 
-# Step 4: Upload Video to YouTube (Placeholder)
-def upload_to_youtube(video_file, title, description):
-    """
-    Upload a video to YouTube. (Placeholder function)
-    Args:
-        video_file (str): Path to the video file.
-        title (str): Title of the video.
-        description (str): Description of the video.
-    """
+def authenticate_youtube():
     try:
-        # Simulate YouTube upload
-        print(f"Uploading {video_file} to YouTube with title '{title}' and description '{description}'")
-        # Actual YouTube API integration should go here
-        print("Video uploaded successfully!")
+        flow = InstalledAppFlow.from_client_secrets_file(".gitignore/client_secrets2.json", scopes=["https://www.googleapis.com/auth/youtube.upload"])
+        credentials = flow.run_console()
+        youtube = build("youtube", "v3", credentials=credentials, cache=MemoryCache())
+        return youtube
     except Exception as e:
-        print(f"Error uploading video: {e}")
+        print(f"[ERROR] YouTube authentication failed: {e}")
+        return None
 
-# Main Function
+def upload_to_youtube(youtube, video_file, title, description):
+    try:
+        request_body = {
+            "snippet": {
+                "title": title,
+                "description": description,
+                "tags": ["Abundance", "Meditation", "Manifest Anything"],
+                "categoryId": "24"
+            },
+            "status": {
+                "privacyStatus": "public"
+            }
+        }
+        media = MediaFileUpload(video_file, chunksize=-1, resumable=True)
+        upload_request = youtube.videos().insert(
+            part="snippet,status",
+            body=request_body,
+            media_body=media
+        )
+        response = upload_request.execute()
+        print(f"[UPLOAD SUCCESSFUL] Video ID: {response['id']}")
+    except Exception as e:
+        print(f"[ERROR] Failed to upload video: {e}")
+
 def main():
     try:
-        # Fetch trending topics
+        youtube = authenticate_youtube()
+        if not youtube:
+            print("[ERROR] Exiting due to failed YouTube authentication.")
+            return
+
         trends = fetch_trends()
-
         for idx, trend in enumerate(trends):
-            # Generate filenames
-            audio_file = f"audio_{idx}.mp3"
-            video_file = f"video_{idx}.mp4"
-            trend_text = f"Discover the latest trend: {trend}"
+            audio_file = f"audio/audio_{idx}.mp3"
+            video_file = f"video/video_{idx}.mp4"
+            trend_text = f"Manifest ANYTHING {trend} in just 10 minutes!"
 
-            # Generate audio
+            print(f"\n[PROCESSING TREND] {trend}")
             generate_audio(trend_text, audio_file)
-
-            # Create video
             create_video(audio_file, video_file, trend_text)
-
-            # Upload to YouTube
-            upload_to_youtube(
-                video_file,
-                title=f"Latest Trend: {trend}",
-                description=f"Stay updated on the latest trend: {trend}. Posted on {datetime.now().strftime('%Y-%m-%d')}."
-            )
-
-            # Cleanup files
+            title = f"Windows Tips: {trend}"
+            description = f"Live in total {trend}. This video will help you!"
+            upload_to_youtube(youtube, video_file, title, description)
             os.remove(audio_file)
             os.remove(video_file)
-            print(f"Cleaned up files for trend: {trend}")
-
-            # Pause between uploads to avoid rate limits
+            print(f"[CLEANUP COMPLETE] Removed {audio_file} and {video_file}")
             time.sleep(5)
-
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"[ERROR] Unexpected error occurred: {e}")
 
 if __name__ == "__main__":
     main()
