@@ -6,18 +6,11 @@ from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
 # Step 1: Fetch Google Trends
-def fetch_google_trends_data(keywords, timeframe="now 3-d"):
-    """
-    Fetches Google Trends data for the given keywords and timeframe.
-    
-    Args:
-        keywords (list): List of keywords to fetch data for.
-        timeframe (str): Timeframe for Google Trends data.
-
-    Returns:
-        dict: Dictionary with keyword as the key and its trends data as the value.
-    """
+def fetch_google_trends_data(keywords, timeframe="today 2-y"):
+   
     pytrends = TrendReq(hl="en-US", tz=360)
     trends_data = {}
     
