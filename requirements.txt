@@ -1,4 +1,5 @@
 gtts
+ffmpeg
 moviepy
 pandas
 google-auth-oauthlib
