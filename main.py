@@ -16,7 +16,7 @@ from googleapiclient.discovery import build
 
 def authenticate_with_google():
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-    CLIENT_SECRET_FILE = 'Users/captk/client_secret.json'
+    CLIENT_SECRET_FILE = 'Users/captk/client_secret2.json'
     flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
     credentials = flow.run_local_server(port=0)
     return credentials
