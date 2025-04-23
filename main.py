@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pytrends.request import TrendReq
 from gtts import gTTS
-from moviepy.editor import TextClip, AudioFileClip, VideoFileClip
+from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
