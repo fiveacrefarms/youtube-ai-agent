@@ -29,8 +29,14 @@ jobs:
       run: |
         python main.py
 
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: daily-videos
+        path: C:\Users\captk\youtube-ai-agent\build\artifacts
+
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: daily-videos
         path: C:\Users\captk\youtube-ai-agent\build\artifacts
