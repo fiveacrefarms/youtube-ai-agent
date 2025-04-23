@@ -42,7 +42,7 @@ def fetch_google_trends_data(keywords, timeframe="today 2-y"):
 
 if __name__ == "__main__":
     # Example keywords
-    kw_list = ["Manifestation", "Meditation", "reality"]
+    kw_list = ["Quantum Realm", "Meditation", "reality"]
     
     # Fetch data and handle errors
     trends_data = fetch_google_trends_data(kw_list)
