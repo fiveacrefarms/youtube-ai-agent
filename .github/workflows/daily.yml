@@ -48,4 +48,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: daily-artifacts
-        path: -r "c:\Users\captk\videos
+        path: r"c:\Users\captk\videos
