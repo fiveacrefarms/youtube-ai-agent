@@ -79,7 +79,7 @@ def main():
             # Call function to generate audio
             generate_audio(trend_text, audio_file)
 
-    except Exception as e:
+   except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
 # Example function for generating audio (replace with your actual implementation)
