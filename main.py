@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from pytrends.request import TrendReq
+from pytrends.exceptions import ResponseError
 from gtts import gTTS
 from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
