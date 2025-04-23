@@ -15,22 +15,22 @@ def fetch_trends():
 
 text = "THIS is stopping manifestation or your DESIRED reality!"
 # Step 2: Generate Text-to-Speech
-def generate_audio(text, audio_0.mp3):
+def generate_audio(text, "audio_0.mp3"):
     tts = gTTS(text=text, lang="en")
     tts.save(text_0.mp3)
 
 # Step 3: Create Faceless Video
-def create_video(audio_0.mp3, ytv_0.mp4, text):
+def create_video("audio_0.mp3", "ytv_0.mp4", text):
     # Create a text clip
     text_clip = TextClip(text, fontsize=70, color="white", size=(1280, 720), bg_color="black")
     text_clip = text_clip.set_duration(10)  # 10 seconds per slide
 
     # Add audio to the text clip
-    audio = AudioFileClip(audio_0.mp3)
+    audio = AudioFileClip("audio_0.mp3")
     video = text_clip.set_audio(audio)
 
     # Export the video
-    video.write_videofile(ytv_0.mp4, fps=24)
+    video.write_videofile("ytv_0.mp4", fps=24)
 video_file = "ytv_0.mp4"
 
 # Step 4: Upload Video to YouTube
