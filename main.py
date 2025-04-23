@@ -7,6 +7,10 @@ from moviepy import TextClip, AudioFileClip, VideoFileClip
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+import time
+from pytrends.request import TrendReq
+from pytrends.exceptions import ResponseError
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
 # Step 1: Fetch Google Trends
