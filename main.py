@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 from gtts import gTTS
-from moviepy.video.io import AudioFileClip, VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 # Removed YouTube-specific imports
 
