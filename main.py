@@ -7,13 +7,56 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 # Step 1: Fetch Google Trends
-def fetch_trends():
-    pytrends = TrendReq()
-    kw_list = ["manifestation", "meditation", "reality"]
-    pytrends.build_payload(kw_list=kw_list, geo="US", timeframe="now 3-d")
-    trends = pytrends.trending_searches(pn="united_states")
-    return trends[0].head(3).values.tolist()
+def fetch_google_trends_data(keywords, timeframe="now 3-d"):
+    """
+    Fetches Google Trends data for the given keywords and timeframe.
+    
+    Args:
+        keywords (list): List of keywords to fetch data for.
+        timeframe (str): Timeframe for Google Trends data.
 
+    Returns:
+        dict: Dictionary with keyword as the key and its trends data as the value.
+    """
+    pytrends = TrendReq(hl="en-US", tz=360)
+    trends_data = {}
+    
+    for keyword in keywords:
+        try:
+            print(f"Fetching data for keyword: {keyword}")
+            
+            # Build payload for the keyword
+            pytrends.build_payload([keyword], timeframe=timeframe)
+            
+            # Fetch interest over time data
+            data = pytrends.interest_over_time()
+            
+            # Save the data to the dictionary
+            if not data.empty:
+                trends_data[keyword] = data
+            else:
+                print(f"No data available for keyword: {keyword}")
+            
+        except ResponseError as e:
+            print(f"Error with keyword '{keyword}': {e}")
+        
+        # Add a delay to avoid rate limiting
+        time.sleep(10)
+    
+    return trends_data
+
+
+if __name__ == "__main__":
+    # Example keywords
+    kw_list = ["Manifestation", "Meditation", "reality"]
+    
+    # Fetch data and handle errors
+    trends_data = fetch_google_trends_data(kw_list)
+    
+    # Print the results
+    for keyword, data in trends_data.items():
+        print(f"\nTrends data for '{keyword}':")
+        print(data)
 text = "THIS is stopping manifestation or your DESIRED reality!"
 # Step 2: Generate Text-to-Speech
 def generate_audio(text, audio_path):
