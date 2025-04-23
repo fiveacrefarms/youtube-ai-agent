@@ -28,6 +28,12 @@ def create_video(audio_path, video_path, text):
     except Exception as e:
         print(f"[ERROR] Failed to create video: {e}")
 
+def create_artifacts():
+    try:
+        # Define the artifacts directory
+        artifacts_dir = "artifacts"
+        os.makedirs(artifacts_dir, exist_ok=True)
+
 def main():
     try:
         # Removed YouTube authentication
