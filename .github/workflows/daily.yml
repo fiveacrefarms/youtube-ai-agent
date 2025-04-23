@@ -2,7 +2,7 @@ name: Run main.py Workflow
 
 on:
   schedule:
-    - cron: '00 12 * * *' # Runs at 7:00 AM CST or 7:00 AM CDT adjusted to UTC time
+    - cron: '0 12 * * *' # Runs daily at 12:00 PM UTC (7:00 AM CST/CDT)
   workflow_dispatch: # Allows manual triggering of the workflow
   push: # Triggers when code is pushed to the repository
     branches:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   run-script:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest # Updated to match your Windows environment
 
     steps:
     - name: Checkout code
@@ -19,33 +19,18 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.13 # Specify the Python version
+        python-version: 3.10 # Use a stable version of Python
 
     - name: Install dependencies
       run: |
         python -m pip install -r requirements.txt
 
-    - name: Create required directories
-      run: |
-        mkdir -p audio
-        mkdir -p video
-
-    - name: Run main.py
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: .gitignore/client_secrets2.json
+    - name: Run main.py to generate videos
       run: |
         python main.py
-
-    - name: Generate artifacts
-      run: |
-        mkdir -p artifacts
-        python main.py # Replace with the script that generates artifacts
-        # Move or copy generated files to the artifacts folder
-        mv generated_file_1.txt artifacts/
-        mv generated_file_2.log artifacts/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: daily-artifacts
-        path: r"c:\Users\captk\videos"
+        name: daily-videos
+        path: C:\Users\captk\youtube-ai-agent\build\artifacts
