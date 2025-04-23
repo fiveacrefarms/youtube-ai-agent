@@ -52,13 +52,10 @@ def main():
             create_video(audio_file, video_file, trend_text)
 
 def main():
-    """
-    Main function to generate audio and video files and save them locally.
-    """
+
     try:
-        # Define the directory on your PC where you want to save the files
-        # Update this path as needed to match your desired location
-        output_dir = r"C:\Users\captk\Documents\GeneratedContent"
+       
+        output_dir = r"C:\Users\captk\videos"
         os.makedirs(output_dir, exist_ok=True)  # Create the directory if it doesn't exist
 
         # Fetch trends and generate audio and video files
