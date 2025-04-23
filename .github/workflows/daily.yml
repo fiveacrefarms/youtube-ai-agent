@@ -1,8 +1,11 @@
 name: YouTube Automation
+on: workflow_dispatch
 
-on:
-  schedule:
-     - cron: "0 7 * * *" #runs at 07:00 UTC-5 everyday
+
+
+  on:
+    schedule:
+       - cron: "0 7 * * *" #runs at 07:00 UTC-5 everyday
 
 jobs:
   build:
