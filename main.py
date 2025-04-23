@@ -92,9 +92,7 @@ def main():
             title = f"Windows Tips: {trend}"
             description = f"Live in total {trend}. This video will help you!"
             upload_to_youtube(youtube, video_file, title, description)
-            os.remove(audio_file)
-            os.remove(video_file)
-            print(f"[CLEANUP COMPLETE] Removed {audio_file} and {video_file}")
+           
             time.sleep(5)
     except Exception as e:
         print(f"[ERROR] Unexpected error occurred: {e}")
