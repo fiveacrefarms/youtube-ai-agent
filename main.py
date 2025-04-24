@@ -2,13 +2,6 @@ import subprocess
 import os
 import sys
 
-def run_script(script_name):
-    
-    with:
-        result = subprocess.run([sys.executable, script_name], check=True, capture_output=True, text=True)
-        print(f"[INFO] {script_name} ran successfully.")
-        print(result.stdout)  # Print the output of the script for debugging
-   
 
 def main():
    
