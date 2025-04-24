@@ -1,103 +1,86 @@
+import cv2
 import os
-import subprocess
-import pyttsx3
 
-# Paths to assets
-VIDEO_CLIPS_DIR = "video_clips"
-BACKGROUND_MUSIC = "background_music.mp3"
-SCRIPT_FILE = "script.txt"
-OUTPUT_VIDEO = "output_video.mp4"
-VOICEOVER_AUDIO = "voiceover.mp3"
-CAPTIONS_FILE = "captions.srt"
-
-
-def text_to_speech(script, output_audio=VOICEOVER_AUDIO):
+def split_video(video_path, segment_duration=10):
     """
-    Convert the script to speech and save it as an audio file.
+    Splits a video into segments of a given duration (in seconds).
     """
-    print("[INFO] Generating voiceover...")
-    tts_engine = pyttsx3.init()
-    tts_engine.setProperty("rate", 150)  # Adjust narration speed if needed
-    tts_engine.save_to_file(script, output_audio)
-    tts_engine.runAndWait()
-    print(f"[INFO] Voiceover saved to {output_audio}")
+    cap = cv2.VideoCapture(video_path)
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
+    video_segments = []
+    count = 0
+    segment_index = 0
 
-def create_captions(script):
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Create a new video segment file every `segment_duration` seconds
+        if count % (fps * segment_duration) == 0:
+            if 'out' in locals():
+                out.release()
+            segment_file = f"segment_{segment_index}.mp4"
+            out = cv2.VideoWriter(segment_file, fourcc, fps, (frame_width, frame_height))
+            video_segments.append(segment_file)
+            segment_index += 1
+
+        out.write(frame)
+        count += 1
+
+    if 'out' in locals():
+        out.release()
+    cap.release()
+    return video_segments
+
+def concatenate_videos(video_files, output_file="output_video.mp4"):
     """
-    Create a simple captions file (SubRip Subtitle - .srt format) based on the script.
-    Each sentence gets a 5-second duration for simplicity.
+    Concatenates a list of video files into one video.
     """
-    print("[INFO] Generating captions...")
-    lines = script.split('. ')
-    with open(CAPTIONS_FILE, "w") as f:
-        start_time = 0
-        for i, line in enumerate(lines, start=1):
-            end_time = start_time + 5  # Each caption lasts 5 seconds
-            start = f"{start_time//60:02}:{start_time%60:02},000"
-            end = f"{end_time//60:02}:{end_time%60:02},000"
-            f.write(f"{i}\n{start} --> {end}\n{line.strip()}\n\n")
-            start_time = end_time
-    print(f"[INFO] Captions saved to {CAPTIONS_FILE}")
-
-
-def concatenate_clips(output_file="concatenated.mp4"):
-    """
-    Concatenate video clips in the VIDEO_CLIPS_DIR into a single video.
-    Use ffmpeg to handle the concatenation.
-    """
-    print("[INFO] Concatenating video clips...")
-    with open("file_list.txt", "w") as f:
-        for clip in sorted(os.listdir(VIDEO_CLIPS_DIR)):
-            if clip.endswith(".mp4"):
-                f.write(f"file '{os.path.join(VIDEO_CLIPS_DIR, clip)}'\n")
-
-    # Use ffmpeg to concatenate the clips
-    subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "file_list.txt",
-        "-c", "copy", output_file
-    ], check=True)
-    print(f"[INFO] Concatenated video saved to {output_file}")
-
-
-def add_audio_and_captions(video_file, audio_file, captions_file, output_file):
-    """
-    Combine video, background music, and captions into the final output video.
-    """
-    print("[INFO] Adding audio and captions to the video...")
-    subprocess.run([
-        "ffmpeg", "-y", "-i", video_file, "-i", audio_file, "-vf", f"subtitles={captions_file}",
-        "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k", output_file
-    ], check=True)
-    print(f"[INFO] Final video saved to {output_file}")
-
-
-def assemble_video():
-    """
-    Assemble the video by combining video clips, voiceover, captions, and background music.
-    """
-    # Step 1: Load the script
-    if not os.path.exists(SCRIPT_FILE):
-        print(f"[ERROR] Script file {SCRIPT_FILE} not found!")
+    if not video_files:
+        print("[ERROR] No video files to concatenate.")
         return
-    with open(SCRIPT_FILE, "r") as f:
-        script = f.read()
 
-    # Step 2: Generate voiceover
-    text_to_speech(script)
+    # Get the properties of the first video
+    cap = cv2.VideoCapture(video_files[0])
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    cap.release()
 
-    # Step 3: Generate captions
-    create_captions(script)
+    out = cv2.VideoWriter(output_file, fourcc, fps, (frame_width, frame_height))
 
-    # Step 4: Concatenate video clips
-    concatenated_video = "concatenated.mp4"
-    concatenate_clips(concatenated_video)
+    for video_file in video_files:
+        print(f"Processing {video_file}...")
+        cap = cv2.VideoCapture(video_file)
 
-    # Step 5: Add audio and captions to the video
-    add_audio_and_captions(concatenated_video, VOICEOVER_AUDIO, CAPTIONS_FILE, OUTPUT_VIDEO)
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            out.write(frame)
 
-    print("[INFO] Video assembly completed successfully!")
+        cap.release()
 
+    out.release()
+    print(f"Final video saved as {output_file}")
 
 if __name__ == "__main__":
-    assemble_video()
+    # List of video files to concatenate
+    video_files = ["video1.mp4", "video2.mp4", "video3.mp4"]  # Replace with your actual video file paths
+
+    all_segments = []
+
+    # Step 1: Split videos into 10-second segments
+    for video_file in video_files:
+        print(f"Splitting {video_file} into 10-second segments...")
+        segments = split_video(video_file, segment_duration=10)
+        all_segments.extend(segments)
+
+    # Step 2: Concatenate all segments into a single video
+    concatenate_videos(all_segments, output_file="output_video.mp4")
