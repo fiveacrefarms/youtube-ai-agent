@@ -5,13 +5,10 @@ import sys
 def run_script(script_name):
     
     try:
-        result = subprocess.run([sys.executable, {script_name}], check=True, capture_output=True, text=True)
+        result = subprocess.run([sys.executable, script_name], check=True, capture_output=True, text=True)
         print(f"[INFO] {script_name} ran successfully.")
         print(result.stdout)  # Print the output of the script for debugging
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to execute {script_name}.")
-        print(f"[ERROR] {e.stderr}")
-        sys.exit(1)
+   
 
 def main():
    
