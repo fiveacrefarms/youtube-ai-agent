@@ -30,13 +30,8 @@ jobs:
         python main.py
 
     - name: Download artifacts
-      uses: actions/download-artifact@v2
+      uses: dawidd6/action-download-artifact@v2
       with:
-        name: daily-videos
-        path: C:\Users\captk\youtube-ai-agent\build\artifacts
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
+        workflow: Run artif.py Workflow # The name of the upload workflow
         name: daily-videos
         path: C:\Users\captk\youtube-ai-agent\build\artifacts
