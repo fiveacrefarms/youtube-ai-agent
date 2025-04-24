@@ -1,7 +1,5 @@
 import os
-from moviepy.editor import (
-    VideoFileClip, concatenate_videoclips, TextClip, CompositeVideoClip, AudioFileClip
-)
+import subprocess
 import pyttsx3
 
 # Paths to assets
@@ -9,10 +7,13 @@ VIDEO_CLIPS_DIR = "video_clips"
 BACKGROUND_MUSIC = "background_music.mp3"
 SCRIPT_FILE = "script.txt"
 OUTPUT_VIDEO = "output_video.mp4"
+VOICEOVER_AUDIO = "voiceover.mp3"
+CAPTIONS_FILE = "captions.srt"
 
-def text_to_speech(script, output_audio="voiceover.mp3"):
+
+def text_to_speech(script, output_audio=VOICEOVER_AUDIO):
     """
-    Convert the script to speech and save as an audio file.
+    Convert the script to speech and save it as an audio file.
     """
     print("[INFO] Generating voiceover...")
     tts_engine = pyttsx3.init()
@@ -20,43 +21,83 @@ def text_to_speech(script, output_audio="voiceover.mp3"):
     tts_engine.save_to_file(script, output_audio)
     tts_engine.runAndWait()
     print(f"[INFO] Voiceover saved to {output_audio}")
-    return output_audio
 
-def create_scrolling_text(script, duration, video_size):
+
+def create_captions(script):
     """
-    Create scrolling captions from the script that match the narration.
+    Create a simple captions file (SubRip Subtitle - .srt format) based on the script.
+    Each sentence gets a 5-second duration for simplicity.
     """
-    print("[INFO] Creating scrolling text...")
-    text_clip = TextClip(script, fontsize=24, color="white", size=video_size, bg_color="black", method="caption")
-    scrolling_text = text_clip.set_position(("center", "bottom")).set_duration(duration)
-    return scrolling_text
+    print("[INFO] Generating captions...")
+    lines = script.split('. ')
+    with open(CAPTIONS_FILE, "w") as f:
+        start_time = 0
+        for i, line in enumerate(lines, start=1):
+            end_time = start_time + 5  # Each caption lasts 5 seconds
+            start = f"{start_time//60:02}:{start_time%60:02},000"
+            end = f"{end_time//60:02}:{end_time%60:02},000"
+            f.write(f"{i}\n{start} --> {end}\n{line.strip()}\n\n")
+            start_time = end_time
+    print(f"[INFO] Captions saved to {CAPTIONS_FILE}")
+
+
+def concatenate_clips(output_file="concatenated.mp4"):
+    """
+    Concatenate video clips in the VIDEO_CLIPS_DIR into a single video.
+    Use ffmpeg to handle the concatenation.
+    """
+    print("[INFO] Concatenating video clips...")
+    with open("file_list.txt", "w") as f:
+        for clip in sorted(os.listdir(VIDEO_CLIPS_DIR)):
+            if clip.endswith(".mp4"):
+                f.write(f"file '{os.path.join(VIDEO_CLIPS_DIR, clip)}'\n")
+
+    # Use ffmpeg to concatenate the clips
+    subprocess.run([
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "file_list.txt",
+        "-c", "copy", output_file
+    ], check=True)
+    print(f"[INFO] Concatenated video saved to {output_file}")
+
+
+def add_audio_and_captions(video_file, audio_file, captions_file, output_file):
+    """
+    Combine video, background music, and captions into the final output video.
+    """
+    print("[INFO] Adding audio and captions to the video...")
+    subprocess.run([
+        "ffmpeg", "-y", "-i", video_file, "-i", audio_file, "-vf", f"subtitles={captions_file}",
+        "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k", output_file
+    ], check=True)
+    print(f"[INFO] Final video saved to {output_file}")
+
 
 def assemble_video():
     """
-    Assemble video clips with voiceover, background music, and synchronized captions.
+    Assemble the video by combining video clips, voiceover, captions, and background music.
     """
-    print("[INFO] Loading video clips...")
-    video_clips = [
-        VideoFileClip(os.path.join(VIDEO_CLIPS_DIR, clip))
-        for clip in os.listdir(VIDEO_CLIPS_DIR) if clip.endswith(".mp4")
-    ]
-    final_video = concatenate_videoclips(video_clips, method="compose")
-
-    # Load script
+    # Step 1: Load the script
+    if not os.path.exists(SCRIPT_FILE):
+        print(f"[ERROR] Script file {SCRIPT_FILE} not found!")
+        return
     with open(SCRIPT_FILE, "r") as f:
         script = f.read()
 
-    # Generate voiceover and scrolling captions
-    voiceover_audio = text_to_speech(script)
-    scrolling_text = create_scrolling_text(script, final_video.duration, final_video.size)
+    # Step 2: Generate voiceover
+    text_to_speech(script)
 
-    # Add background music and overlay captions
-    background_music = AudioFileClip(BACKGROUND_MUSIC).set_duration(final_video.duration)
-    final_video = CompositeVideoClip([final_video, scrolling_text]).set_audio(background_music)
+    # Step 3: Generate captions
+    create_captions(script)
 
-    print("[INFO] Saving final video...")
-    final_video.write_videofile(OUTPUT_VIDEO, fps=24, codec="libx264", audio_codec="aac")
-    print(f"[INFO] Video saved to {OUTPUT_VIDEO}")
+    # Step 4: Concatenate video clips
+    concatenated_video = "concatenated.mp4"
+    concatenate_clips(concatenated_video)
+
+    # Step 5: Add audio and captions to the video
+    add_audio_and_captions(concatenated_video, VOICEOVER_AUDIO, CAPTIONS_FILE, OUTPUT_VIDEO)
+
+    print("[INFO] Video assembly completed successfully!")
+
 
 if __name__ == "__main__":
     assemble_video()
