@@ -1,5 +1,7 @@
 transformers
 pyttsx3
+flex
+torch
 gtts
 ffmpeg-python
 moviepy==1.0.3
