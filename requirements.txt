@@ -1,6 +1,7 @@
 transformers
+pyttsx3
 gtts
-ffmpeg
+ffmpeg-python
 moviepy==1.0.3
 pandas
 google-auth-oauthlib
