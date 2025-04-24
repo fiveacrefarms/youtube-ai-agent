@@ -2,7 +2,19 @@ import subprocess
 import os
 import sys
 
-
+def run_script(script_name):
+    """
+    Runs a Python script using subprocess.
+    :param script_name: The name of the Python script to run.
+    """
+    try:
+        print(f"[INFO] Running {script_name}...")
+        subprocess.run(["python", script_name], check=True)
+        print(f"[INFO] {script_name} ran successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to execute {script_name}.")
+        print(e)
+       
 def main():
    
     print("[INFO] Starting the vlog automation pipeline...")
