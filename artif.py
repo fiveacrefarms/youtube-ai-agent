@@ -1,15 +1,11 @@
 import os
 import requests
 
-# Configuration
-GITHUB_TOKEN = "YOUR_PERSONAL_ACCESS_TOKEN"  # Replace with your GitHub Personal Access Token
-REPO_OWNER = "fiveacrefarms"  # Replace with the owner of the repository
-REPO_NAME = "youtube-ai-agent"  # Replace with the repository name
-OUTPUT_DIR = r"C:\Users\captk\youtube-ai-agent\downloaded_artifacts"  # Directory where artifacts will be saved
-
-# GitHub API URLs
-BASE_URL = "https://api.github.com"
-WORKFLOW_RUNS_URL = f"{BASE_URL}/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs"
+# Fetch GitHub-provided environment variables
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+REPO_OWNER = os.getenv("GITHUB_REPOSITORY_OWNER")  # Automatically set to the repository owner
+REPO_NAME = os.getenv("GITHUB_REPOSITORY").split("/")[1]  # Automatically set to the repository name
+OUTPUT_DIR = r"C:\Users\captk\youtube-ai-agent\downloaded_artifacts"  # Directory to save artifacts
 
 def ensure_output_directory():
     """
@@ -18,35 +14,33 @@ def ensure_output_directory():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     print(f"[INFO] Output directory ensured: {OUTPUT_DIR}")
 
-def get_latest_workflow_run():
+def download_artifacts():
     """
-    Get the latest workflow run from the GitHub repository.
-    Returns:
-        dict: A dictionary containing the workflow run details, or None if not found.
+    Fetch and download the latest artifacts.
     """
     headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
-    response = requests.get(WORKFLOW_RUNS_URL, headers=headers)
+    workflow_runs_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs"
+
+    # Fetch the latest workflow runs
+    print("[INFO] Fetching workflow runs...")
+    response = requests.get(workflow_runs_url, headers=headers)
 
     if response.status_code != 200:
         print(f"[ERROR] Failed to fetch workflow runs: {response.status_code} {response.text}")
-        return None
+        return
 
     runs = response.json().get("workflow_runs", [])
     if not runs:
         print("[WARNING] No workflow runs found.")
-        return None
+        return
 
-    # Return the latest workflow run
-    return runs[0]
+    # Get the latest workflow run
+    latest_run = runs[0]
+    run_id = latest_run["id"]
+    artifacts_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs/{run_id}/artifacts"
 
-def download_artifacts(run_id):
-    """
-    Download artifacts from the specified workflow run.
-    Args:
-        run_id (int): The workflow run ID.
-    """
-    artifacts_url = f"{WORKFLOW_RUNS_URL}/{run_id}/artifacts"
-    headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
+    # Fetch artifacts for the latest workflow run
+    print(f"[INFO] Fetching artifacts for workflow run ID: {run_id}...")
     response = requests.get(artifacts_url, headers=headers)
 
     if response.status_code != 200:
@@ -62,7 +56,7 @@ def download_artifacts(run_id):
         artifact_name = artifact["name"]
         download_url = artifact["archive_download_url"]
 
-        print(f"[INFO] Downloading artifact: {artifact_name}")
+        print(f"[INFO] Downloading artifact: {artifact_name}...")
         artifact_response = requests.get(download_url, headers=headers, stream=True)
 
         if artifact_response.status_code != 200:
@@ -78,17 +72,10 @@ def download_artifacts(run_id):
 
 def main():
     """
-    Main function to download artifacts from the latest workflow run.
+    Main function to download artifacts.
     """
     ensure_output_directory()
-    latest_run = get_latest_workflow_run()
-
-    if latest_run:
-        run_id = latest_run["id"]
-        print(f"[INFO] Latest workflow run ID: {run_id}")
-        download_artifacts(run_id)
-    else:
-        print("[ERROR] No workflow run found.")
+    download_artifacts()
 
 if __name__ == "__main__":
     main()
