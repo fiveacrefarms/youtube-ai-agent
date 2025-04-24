@@ -1,36 +1,29 @@
-name: Run main.py Workflow
+name: Daily Vlog Automation
 
 on:
   schedule:
-    - cron: '0 12 * * *' # Runs daily at 12:00 PM UTC (7:00 AM CST/CDT)
-  workflow_dispatch: # Allows manual triggering
-  push: # Triggers when code is pushed to the repository
-    branches:
-      - main
+    - cron: '0 12 * * *' # Runs daily at 12:00 PM UTC
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  run-script:
-    runs-on: windows-latest # Updated to match your environment
+  daily-vlog:
+    runs-on: windows-latest
 
     steps:
-    - name: Checkout code
+    # Step 1: Checkout repository
+    - name: Checkout repository
       uses: actions/checkout@v3
 
+    # Step 2: Setup Python environment
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: 3.13
 
+    # Step 4: Install dependencies
     - name: Install dependencies
-      run: |
-        python -m pip install -r requirements.txt
+      run: python -m pip install -r requirements.txt
 
-    - name: Run main.py to generate videos
-      run: |
-        python main.py
-
-    - name: Download artifacts
-      run: |
-           artif.py Workflow 
-            name: daily-videos
-            path: C:\Users\captk\youtube-ai-agent\build\artifacts
+    # Step 5: Run the main automation script
+    - name: Run main.py
+      run: python main.py
