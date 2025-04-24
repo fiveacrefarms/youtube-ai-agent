@@ -1,86 +1,51 @@
+import subprocess
 import os
-from gtts import gTTS
-from moviepy.editor import TextClip, AudioFileClip, CompositeVideoClip
+import sys
 
-# Define constants
-OUTPUT_DIR = r"C:\Users\captk\youtube-ai-agent\build\artifacts"
-TRENDS = ["Abundance", "Meditation", "Manifest Anything"]
-
-def fetch_trends():
+def run_script(script_name):
     """
-    Fetch the trends for video generation.
-    Returns:
-        list: A list of trending topics.
-    """
-    return TRENDS
-
-def generate_audio(text, audio_path):
-    """
-    Generate an audio file using Google Text-to-Speech (gTTS).
-    Args:
-        text (str): The text to be converted into speech.
-        audio_path (str): The path to save the audio file.
+    Runs a Python script as a subprocess and checks for errors.
     """
     try:
-        tts = gTTS(text=text, lang="en")
-        tts.save(audio_path)
-        print(f"[AUDIO GENERATED] {audio_path}")
-    except Exception as e:
-        print(f"[ERROR] Failed to generate audio: {e}")
-
-def create_video(audio_path, video_path, text):
-    """
-    Create a video file with text overlay and audio.
-    Args:
-        audio_path (str): The path to the audio file.
-        video_path (str): The path to save the video file.
-        text (str): The text to display in the video.
-    """
-    try:
-        # Create a text clip
-        text_clip = TextClip(
-            text,
-            fontsize=50,
-            color="white",
-            size=(1280, 720),
-            bg_color="black"
-        ).set_duration(10)  # Duration in seconds
-
-        # Load the audio file
-        audio = AudioFileClip(audio_path)
-
-        # Combine text and audio into a video
-        video = CompositeVideoClip([text_clip]).set_audio(audio)
-        video.write_videofile(video_path, fps=24)
-        print(f"[VIDEO CREATED] {video_path}")
-    except Exception as e:
-        print(f"[ERROR] Failed to create video: {e}")
+        result = subprocess.run([sys.executable, script_name], check=True, capture_output=True, text=True)
+        print(f"[INFO] {script_name} ran successfully.")
+        print(result.stdout)  # Print the output of the script for debugging
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to execute {script_name}.")
+        print(f"[ERROR] {e.stderr}")
+        sys.exit(1)
 
 def main():
     """
-    Main function to generate videos based on trending topics.
+    Orchestrates the pipeline by running all scripts in sequence.
     """
-    try:
-        # Ensure the output directory exists
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
+    print("[INFO] Starting the vlog automation pipeline...")
+    
+    # Step 1: Generate the vlog script
+    if os.path.exists("generate_script.py"):
+        print("[INFO] Running generate_script.py...")
+        run_script("generate_script.py")
+    else:
+        print("[ERROR] Missing generate_script.py. Make sure it exists.")
+        sys.exit(1)
 
-        # Fetch trends and generate audio and video files
-        trends = fetch_trends()
-        for idx, trend in enumerate(trends):
-            print(f"\n[PROCESSING TREND] {trend}")
+    # Step 2: Assemble the video
+    if os.path.exists("create_video.py"):
+        print("[INFO] Running create_video.py...")
+        run_script("create_video.py")
+    else:
+        print("[ERROR] Missing create_video.py. Make sure it exists.")
+        sys.exit(1)
 
-            # Define file paths
-            audio_path = os.path.join(OUTPUT_DIR, f"audio_{idx}.mp3")
-            video_path = os.path.join(OUTPUT_DIR, f"video_{idx}.mp4")
-            trend_text = f"Manifest ANYTHING {trend} in just 10 minutes!"
+    # Step 3: Upload the video to YouTube
+    if os.path.exists("upload_video.py"):
+        print("[INFO] Running upload_video.py...")
+        run_script("upload_video.py")
+    else:
+        print("[ERROR] Missing upload_video.py. Make sure it exists.")
+        sys.exit(1)
 
-            # Generate and save audio and video files
-            generate_audio(trend_text, audio_path)
-            create_video(audio_path, video_path, trend_text)
-
-        print(f"\n[ALL FILES SAVED] Files have been saved to: {OUTPUT_DIR}")
-    except Exception as e:
-        print(f"[ERROR] Unexpected error occurred: {e}")
+    print("[INFO] Pipeline completed successfully!")
 
 if __name__ == "__main__":
     main()
