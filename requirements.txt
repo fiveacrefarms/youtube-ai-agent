@@ -1,10 +1,8 @@
 transformers
-pyttsx3
+pyttsx4
 flex
 torch
-gtts
-ffmpeg-python
-moviepy==1.0.3
+opencv-python
 pandas
 google-auth-oauthlib
 google-api-python-client
