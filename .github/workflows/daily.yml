@@ -30,7 +30,7 @@ jobs:
         python main.py
 
     - name: Download artifacts
-      uses: dawidd6/action-download-artifact@v2
+      uses: actions/download-artifact@v2
       with:
         workflow: Run artif.py Workflow # The name of the upload workflow
         name: daily-videos
