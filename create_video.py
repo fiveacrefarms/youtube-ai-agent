@@ -3,7 +3,7 @@ import subprocess
 import pyttsx3
 
 # Paths to assets
-VIDEO_CLIPS_DIR = os.path.exists "video_clips"
+VIDEO_CLIPS_DIR = "video_clips"
 BACKGROUND_MUSIC = "background_music.mp3"
 SCRIPT_FILE = "script.txt"
 OUTPUT_VIDEO = "output_video.mp4"
