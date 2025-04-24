@@ -1,39 +1,41 @@
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+import requests
 
-# YouTube API credentials
-API_SERVICE_NAME = "youtube"
-API_VERSION = "v3"
-CLIENT_SECRETS_FILE = "client_secrets.json"
-
-def upload_video(video_file, title, description, tags):
+def upload_video(file_path, upload_url):
     """
-    Upload a video to YouTube.
+    Uploads a video file to a server or platform using HTTP POST.
+
+    Args:
+    - file_path (str): Path to the video file to upload.
+    - upload_url (str): The API endpoint for video uploads.
+
+    Returns:
+    - Response object from the upload request.
     """
-    print("[INFO] Authenticating with YouTube API...")
-    youtube = build(API_SERVICE_NAME, API_VERSION, developerKey="YOUR_YOUTUBE_API_KEY")
+    try:
+        with open(file_path, "rb") as video_file:
+            print(f"Uploading {file_path} to {upload_url}...")
+            files = {"file": video_file}
+            response = requests.post(upload_url, files=files)
 
-    request_body = {
-        "snippet": {
-            "title": title,
-            "description": description,
-            "tags": tags,
-            "categoryId": "22"  # Category 22 is for "People & Blogs"
-        },
-        "status": {
-            "privacyStatus": "public"  # Change to "private" if needed
-        }
-    }
+        if response.status_code == 200:
+            print("Video uploaded successfully!")
+        else:
+            print(f"Failed to upload video. Status code: {response.status_code}")
+            print(f"Response: {response.text}")
 
-    print("[INFO] Uploading video...")
-    media = MediaFileUpload(video_file, chunksize=-1, resumable=True)
-    request = youtube.videos().insert(
-        part="snippet,status",
-        body=request_body,
-        media_body=media
-    )
-    response = request.execute()
-    print(f"[INFO] Video uploaded: {response['id']}")
+        return response
+
+    except FileNotFoundError:
+        print(f"[ERROR] The file {file_path} does not exist.")
+    except Exception as e:
+        print(f"[ERROR] An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
-    upload_video("output_video.mp4", "Daily Inspiration", "An inspiring vlog for your day.", ["vlog", "inspiration", "daily"])
+    # Path to the video file to upload
+    file_path = "output_video.mp4"  # Replace with the actual path to your video file
+
+    # Replace with your upload URL
+    upload_url = "https://example.com/upload"  # Replace with your upload endpoint
+
+    # Upload the video
+    upload_video(file_path, upload_url)
