@@ -1,43 +1,166 @@
-import subprocess
 import os
-import sys
+import requests
+import subprocess
 
-def run_script(script_name):
+# === Configuration ===
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")  # Fetch Pexels API key from GitHub Secrets
+PEXELS_API_URL = "https://api.pexels.com/videos/search"
+OUTPUT_DIR = "video_clips"
+FINAL_OUTPUT = "output_video.mp4"
+TEMP_CONCAT_FILE = "concat_list.txt"  # Temporary file for FFmpeg concatenation
+
+# Ensure the API key is available
+if not PEXELS_API_KEY:
+    raise EnvironmentError("PEXELS_API_KEY is not set. Make sure it is configured as a GitHub Secret.")
+
+# === Fetch Videos ===
+def fetch_videos_from_pexels(query, num_videos=3):
     """
-    Runs a Python script using subprocess.
-    :param script_name: The name of the Python script to run.
+    Fetches video URLs from Pexels API based on a search query.
+
+    Args:
+        query (str): Search keyword for stock videos.
+        num_videos (int): Number of videos to fetch.
+
+    Returns:
+        list: List of video URLs.
     """
-    try:
-        print(f"[INFO] Running {script_name}...")
-        subprocess.run(["python", script_name], check=True)
-        print(f"[INFO] {script_name} ran successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to execute {script_name}.")
-        print(e)
-       
-def main():
-   
-    print("[INFO] Starting the vlog automation pipeline...")
-    
-    # Step 1: Generate the vlog script
-    if os.path.exists("generate_script.py"):
-        print("[INFO] Running generate_script.py...")
-        run_script("generate_script.py")
-    
+    headers = {"Authorization": PEXELS_API_KEY}
+    params = {"query": query, "per_page": num_videos}
+    response = requests.get(PEXELS_API_URL, headers=headers, params=params)
 
-    # Step 2: Assemble the video
-    if os.path.exists("create_video.py"):
-        print("[INFO] Running create_video.py...")
-        run_script("create_video.py")
-   
+    if response.status_code == 200:
+        videos = response.json().get("videos", [])
+        return [video["video_files"][0]["link"] for video in videos]
+    else:
+        print(f"[ERROR] Failed to fetch videos: {response.status_code} - {response.text}")
+        return []
 
-    # Step 3: Upload the video to YouTube
-    if os.path.exists("upload_video.py"):
-        print("[INFO] Running upload_video.py...")
-        run_script("upload_video.py")
-    
+# === Download Videos ===
+def download_videos(video_urls):
+    """
+    Downloads videos from the given URLs.
 
-    print("[INFO] Pipeline completed successfully!")
+    Args:
+        video_urls (list): List of video URLs.
 
+    Returns:
+        list: List of downloaded video file paths.
+    """
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+    video_files = []
+    for i, url in enumerate(video_urls):
+        local_file = os.path.join(OUTPUT_DIR, f"video_{i}.mp4")
+        print(f"Downloading {url} to {local_file}...")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(local_file, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    f.write(chunk)
+            video_files.append(local_file)
+        else:
+            print(f"[ERROR] Failed to download video {url}: {response.status_code}")
+
+    return video_files
+
+# === Deinterlace Video ===
+def deinterlace_video(input_file, output_file):
+    """
+    Deinterlaces a video using FFmpeg.
+
+    Args:
+        input_file (str): Path to the interlaced video file.
+        output_file (str): Path to save the deinterlaced video file.
+    """
+    print(f"Deinterlacing {input_file}...")
+    command = [
+        "ffmpeg",
+        "-i", input_file,
+        "-vf", "yadif",  # Apply the yadif filter for deinterlacing
+        "-c:v", "libx264",  # Encode as H.264
+        "-preset", "medium",
+        "-crf", "23",  # Default quality setting
+        "-c:a", "aac",  # Encode audio as AAC
+        "-strict", "experimental",
+        output_file
+    ]
+    subprocess.run(command, check=True)
+
+# === Create Concatenation File ===
+def create_concat_file(video_files):
+    """
+    Creates a temporary text file for FFmpeg concatenation.
+
+    Args:
+        video_files (list): List of video file paths.
+
+    Returns:
+        str: Path to the temporary concatenation file.
+    """
+    with open(TEMP_CONCAT_FILE, "w") as f:
+        for video in video_files:
+            f.write(f"file '{os.path.abspath(video)}'\n")
+    return TEMP_CONCAT_FILE
+
+# === Concatenate Videos ===
+def concatenate_videos(video_files, output_file):
+    """
+    Concatenates video files using FFmpeg.
+
+    Args:
+        video_files (list): List of video file paths.
+        output_file (str): Path to save the concatenated video.
+    """
+    # Deinterlace videos and prepare for concatenation
+    deinterlaced_files = []
+    for file in video_files:
+        deinterlaced_file = file.replace(".mp4", "_deinterlaced.mp4")
+        deinterlace_video(file, deinterlaced_file)
+        deinterlaced_files.append(deinterlaced_file)
+
+    # Create a concatenation file
+    concat_file = create_concat_file(deinterlaced_files)
+
+    # Run FFmpeg to concatenate videos
+    print(f"Concatenating videos into {output_file}...")
+    command = [
+        "ffmpeg",
+        "-f", "concat",
+        "-safe", "0",
+        "-i", concat_file,
+        "-c:v", "libx264",
+        "-preset", "medium",
+        "-crf", "23",
+        "-c:a", "aac",
+        output_file
+    ]
+    subprocess.run(command, check=True)
+
+    # Clean up temporary files
+    os.remove(concat_file)
+    for file in deinterlaced_files:
+        os.remove(file)
+
+# === Main Script ===
 if __name__ == "__main__":
-    main()
+    # Step 1: Fetch stock videos
+    search_query = "nature"  # Replace with your desired search keyword
+    print("[INFO] Fetching videos from Pexels...")
+    video_urls = fetch_videos_from_pexels(search_query)
+    if not video_urls:
+        print("[ERROR] No videos fetched. Exiting...")
+        exit(1)
+
+    # Step 2: Download the videos
+    print("[INFO] Downloading videos...")
+    video_files = download_videos(video_urls)
+    if not video_files:
+        print("[ERROR] No videos downloaded. Exiting...")
+        exit(1)
+
+    # Step 3: Concatenate and export the final video
+    print("[INFO] Concatenating videos...")
+    concatenate_videos(video_files, FINAL_OUTPUT)
+    print(f"[INFO] Final video saved to {FINAL_OUTPUT}")
