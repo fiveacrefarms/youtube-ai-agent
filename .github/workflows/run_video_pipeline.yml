@@ -25,3 +25,11 @@ jobs:
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}  # Pass the secret as an environment variable
         run: python main.py
+          
+      - name: Upload Video Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: video-artifacts
+          path: |
+            video_clips/
+            output_video.mp4
