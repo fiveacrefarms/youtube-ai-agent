@@ -26,10 +26,10 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: python main.py
 
-      - name: Upload Video Artifacts
-        uses: actions/upload-artifact@v2.2.0
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: video-artifacts
-          path: |
+         name: my-artifact
+         path: |
             video_clips/
             output_video.mp4
