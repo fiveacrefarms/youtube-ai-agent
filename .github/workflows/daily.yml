@@ -1,8 +1,7 @@
 name: Daily Vlog Automation
 
 on:
-  schedule:
-    - cron: '0 12 * * *' # Runs daily at 12:00 PM UTC
+  
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
