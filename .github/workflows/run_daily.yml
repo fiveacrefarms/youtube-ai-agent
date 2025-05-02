@@ -1,8 +1,7 @@
 name: Daily Video Automation
 
 on:
-  schedule:
-    - cron: '0 12 * * *' # Runs daily at 12 PM UTC
+  workflow_dispatch:
 
 jobs:
   build:
