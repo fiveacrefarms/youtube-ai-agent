@@ -5,7 +5,7 @@ on:
 
 jobs:
   run-video-pipeline:
-    runs-on: self-hosted
+    runs-on: [self-hosted, actions_runner]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
